@@ -16,7 +16,8 @@ class  SharePlace extends Component{
   }
   
   state = {
-    placeName: ""
+    placeName: "",
+    location : null
   };
 
   placeNameChangedHandler = val => {
@@ -54,7 +55,7 @@ class  SharePlace extends Component{
   
     placeAddedHandler = () => {
       if (this.state.placeName.trim() !== "") {
-        this.props.onAddPlace(this.state.placeName);
+        this.props.onAddPlace(this.state.placeName,this.state.location);
         this.setState({
           placeName : ""
         })
@@ -62,6 +63,17 @@ class  SharePlace extends Component{
         alert("please input some text first")
       }
     };
+
+    locationPickHandler = location =>{
+      this.setState(preveState => {
+        return {
+          ...preveState,
+          location: location
+        }
+      })
+    }
+
+
     render(){
         return(
           <ScrollView>
@@ -72,7 +84,7 @@ class  SharePlace extends Component{
                 </MainText>
               </View>
              <PickPlace />
-              <PickLocation />
+              <PickLocation onLocationPick = {this.locationPickHandler} />
               <PlaceInput placeName = {this.state.placeName} onChangeText = {this.placeNameChangedHandler} />
               <View style={styles.button}>
                 <Button onPress={this.placeAddedHandler} title="Share the place" />
@@ -100,7 +112,7 @@ const styles = StyleSheet.create({
 
 const mapDispatchToProps = dispatch => {
   return {
-    onAddPlace: placeName => dispatch(addPlace(placeName))
+    onAddPlace: (placeName, location) => dispatch(addPlace(placeName,location))
   };
 };
 

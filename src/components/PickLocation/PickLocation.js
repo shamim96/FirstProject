@@ -2,28 +2,82 @@ import React, { Component } from 'react'
 import { View, Text, Button, StyleSheet, Dimensions } from 'react-native'
 import MapView from 'react-native-maps'
 
+
 class PickPlace extends Component {
 
     state = {
         focusedLocation : {
-            latitude : 37.7900352,
-            longitude : -122.4013726,
+            latitude : 23.825410,
+            longitude : 90.371048,
             latitudeDelta : 0.0122,
             longitudeDelta : Dimensions.get('window').width / Dimensions.get('window').height * 0.0122
 
-        }
+        },
+        locationChoosen : false
+       
     }
 
+    pickLocationHandler = event =>{
+        const coords = event.nativeEvent.coordinate;
+        this.map.animateToRegion({
+            ...this.state.focusedLocation,
+            latitude : coords.latitude,
+            longitude : coords.longitude
+        })
+        this.setState(prevState =>{
+            return {
+                ...prevState,
+                focusedLocation : {
+                    ...prevState.focusedLocation,
+                    latitude : coords.latitude,
+                    longitude : coords.longitude
+                },
+                locationChoosen : true
+            }
+        })
+        this.props.onLocationPick({
+            latitude : coords.latitude,
+            longitude : coords.longitude
+        })
+    }
+
+    getLocationHandler = () =>{
+        navigator.geolocation.getCurrentPosition(pos=>{
+            const coordsEvent = {
+                nativeEvent : {
+                    coordinate : {
+                        latitude : pos.coords.latitude,
+                        longitude : pos.coords.longitude
+                    }
+                }
+            }
+            this.pickLocationHandler(coordsEvent)
+        },
+        err =>{
+            console.log(err);
+            alert("Fetching fail! Please pick location manually")
+        })
+    }
 
     render() {
+
+        let marker = null
+        if(this.state.locationChoosen){
+          marker =  <MapView.Marker coordinate = {this.state.focusedLocation} />
+        } 
+
         return (
             <View style={styles.container}>
-                <MapView
+                <MapView 
+                onPress = {this.pickLocationHandler}
                 style = {styles.map}
                 initialRegion = {this.state.focusedLocation}
-                />
+                ref = {ref => this.map = ref}
+                >
+                    {marker}
+                    </MapView>
                 <View style={styles.button}>
-                    <Button onPress={()=>alert('Locate me')} title="Locate me" />
+                    <Button onPress={this.getLocationHandler} title="Locate me" />
                 </View>
             </View>
         )

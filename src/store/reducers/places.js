@@ -14,9 +14,11 @@ const reducers = (state = initialState, action) =>{
                     name: action.placeName,
                     image : {
                       uri: "https://images.pexels.com/photos/67636/rose-blue-flower-rose-blooms-67636.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"
-                    }
-                  }),
-                  placeName : ""
+                    },
+                    location : action.location
+                  })
+              
+                  
             };
         case DELETE_PLACE :
             return {
